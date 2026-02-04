@@ -3,7 +3,6 @@ package com.naren.insurance.service;
 import com.naren.insurance.model.Policy;
 import com.naren.insurance.model.PolicyStatus;
 import com.naren.insurance.repository.PolicyRepository;
-import com.naren.insurance.service.PolicyService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

@@ -2,9 +2,6 @@ package com.naren.insurance.service;
 
 import com.naren.insurance.model.PolicyAssignment;
 import com.naren.insurance.repository.PolicyAssignmentRepository;
-import com.naren.insurance.service.CustomerService;
-import com.naren.insurance.service.PolicyAssignmentService;
-import com.naren.insurance.service.PolicyService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

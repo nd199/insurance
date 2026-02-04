@@ -2,7 +2,6 @@ package com.naren.insurance.service;
 
 import com.naren.insurance.model.Customer;
 import com.naren.insurance.repository.CustomerRepository;
-import com.naren.insurance.service.CustomerService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

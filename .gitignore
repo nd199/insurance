@@ -1,33 +1,62 @@
-HELP.md
+# ========================
+# Maven / Java
+# ========================
 target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+*.class
+*.log
+*.jar
+*.war
+*.ear
+*.iml
+*.class
+*.db
+*.h2.db
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
 
-### IntelliJ IDEA ###
-.idea
+# ========================
+# IntelliJ IDEA
+# ========================
+.idea/
 *.iws
 *.iml
 *.ipr
+out/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
+# ========================
+# VS Code
+# ========================
 .vscode/
+
+# ========================
+# Mac / Linux OS
+# ========================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ========================
+# Logs / Temporary
+# ========================
+*.log
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# ========================
+# Docker
+# ========================
+docker-compose.override.yml
+*.env
+
+# ========================
+# Other generated files
+# ========================
+*.class
+*.jar
+*.war
+*.ear
+*.iml

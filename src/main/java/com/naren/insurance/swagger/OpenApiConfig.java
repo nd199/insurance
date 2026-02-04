@@ -1,4 +1,4 @@
-package com.naren.insurance.config;
+package com.naren.insurance.swagger;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -14,4 +14,5 @@ import org.springframework.context.annotation.Configuration;
         ),
         security = @SecurityRequirement(name = "bearerAuth")
 )
-public class OpenApiConfig {}
+public class OpenApiConfig {
+}

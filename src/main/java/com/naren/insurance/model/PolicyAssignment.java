@@ -1,58 +1,52 @@
 package com.naren.insurance.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+
 import java.time.LocalDate;
 
 @Entity
 @Table(
-    name = "policy_assignments",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"customer_id", "policy_id"})
-    }
+        name = "policy_assignments",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"customer_id", "policy_id"})
 )
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA only
+@AllArgsConstructor
+@Builder
 public class PolicyAssignment extends BaseEntity {
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "policy_id")
     private Policy policy;
 
+    @NotNull
     @Column(nullable = false)
     private LocalDate startDate;
 
     private LocalDate endDate;
-
-    protected PolicyAssignment() {
-        // JPA only
-    }
-
-    public PolicyAssignment(Customer customer, Policy policy, LocalDate startDate) {
-        this.customer = customer;
-        this.policy = policy;
-        this.startDate = startDate;
-    }
 
     public void terminate(LocalDate endDate) {
         this.endDate = endDate;
         this.policy.expire();
     }
 
-    public Customer getCustomer() {
-        return customer;
+    public void extend(LocalDate newEndDate) {
+        if (newEndDate.isBefore(startDate)) {
+            throw new IllegalArgumentException("End date cannot be before start date");
+        }
+        this.endDate = newEndDate;
     }
 
-    public Policy getPolicy() {
-        return policy;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
+    public boolean isActive() {
+        LocalDate today = LocalDate.now();
+        return startDate.isBefore(today) && (endDate == null || endDate.isAfter(today));
     }
 }

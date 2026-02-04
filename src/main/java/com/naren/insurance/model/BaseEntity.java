@@ -1,9 +1,17 @@
 package com.naren.insurance.model;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
 import java.time.LocalDateTime;
 
 @MappedSuperclass
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SuperBuilder
 public abstract class BaseEntity {
 
     @Id
@@ -25,9 +33,5 @@ public abstract class BaseEntity {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
-    }
-
-    public Long getId() {
-        return id;
     }
 }

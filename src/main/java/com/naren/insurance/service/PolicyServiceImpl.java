@@ -1,6 +1,7 @@
 package com.naren.insurance.service;
 
 import com.naren.insurance.model.Policy;
+import com.naren.insurance.model.PolicyStatus;
 import com.naren.insurance.repository.PolicyRepository;
 import com.naren.insurance.service.PolicyService;
 import jakarta.transaction.Transactional;
@@ -21,7 +22,12 @@ public class PolicyServiceImpl implements PolicyService {
 
     @Override
     public Policy createPolicy(String policyName, BigDecimal premiumAmount) {
-        Policy policy = new Policy(policyName, premiumAmount);
+        Policy policy = Policy.builder()
+                .policyName(policyName)
+                .premiumAmount(premiumAmount)
+                .status(PolicyStatus.ACTIVE)
+                .build();
+
         return policyRepository.save(policy);
     }
 

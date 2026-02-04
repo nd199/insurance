@@ -1,15 +1,25 @@
 package com.naren.insurance.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import lombok.*;
+
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "policies")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class Policy extends BaseEntity {
 
+    @NotBlank
     @Column(nullable = false, length = 100)
     private String policyName;
 
+    @Positive
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal premiumAmount;
 
@@ -17,29 +27,19 @@ public class Policy extends BaseEntity {
     @Column(nullable = false, length = 20)
     private PolicyStatus status;
 
-    protected Policy() {
-        // JPA only
-    }
-
-    public Policy(String policyName, BigDecimal premiumAmount) {
-        this.policyName = policyName;
-        this.premiumAmount = premiumAmount;
-        this.status = PolicyStatus.ACTIVE;
-    }
-
     public void expire() {
         this.status = PolicyStatus.EXPIRED;
     }
 
-    public String getPolicyName() {
-        return policyName;
+    public void suspend() {
+        this.status = PolicyStatus.SUSPENDED;
     }
 
-    public BigDecimal getPremiumAmount() {
-        return premiumAmount;
+    public void cancel() {
+        this.status = PolicyStatus.CANCELLED;
     }
 
-    public PolicyStatus getStatus() {
-        return status;
+    public void activate() {
+        this.status = PolicyStatus.ACTIVE;
     }
 }

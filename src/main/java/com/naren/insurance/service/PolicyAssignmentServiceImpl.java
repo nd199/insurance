@@ -31,11 +31,12 @@ public class PolicyAssignmentServiceImpl implements PolicyAssignmentService {
 
     @Override
     public PolicyAssignment assignPolicy(Long customerId, Long policyId, LocalDate startDate) {
-        PolicyAssignment assignment = new PolicyAssignment(
-                customerService.getCustomerById(customerId),
-                policyService.getPolicyById(policyId),
-                startDate
-        );
+        PolicyAssignment assignment = PolicyAssignment.builder()
+                .customer(customerService.getCustomerById(customerId))
+                .policy(policyService.getPolicyById(policyId))
+                .startDate(startDate)
+                .build();
+
         return assignmentRepository.save(assignment);
     }
 

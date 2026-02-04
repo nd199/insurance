@@ -20,7 +20,12 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer registerCustomer(String fullName, String email, String phoneNumber) {
-        Customer customer = new Customer(fullName, email, phoneNumber);
+        Customer customer = Customer.builder()
+                .fullName(fullName)
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .build();
+
         return customerRepository.save(customer);
     }
 

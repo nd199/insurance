@@ -1,62 +1,74 @@
-# ========================
-# Maven / Java
-# ========================
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!.mvn/wrapper/maven-wrapper.properties
-*.class
-*.log
-*.jar
-*.war
-*.ear
-*.iml
-*.class
-*.db
-*.h2.db
-
-
-# ========================
-# IntelliJ IDEA
-# ========================
+####################################
+# OS / Editor junk
+####################################
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.orig
+.vscode/
 .idea/
 *.iws
 *.iml
 *.ipr
 out/
 
-# ========================
-# VS Code
-# ========================
-.vscode/
-
-# ========================
-# Mac / Linux OS
-# ========================
-.DS_Store
-Thumbs.db
-*.swp
-*.swo
-
-# ========================
-# Logs / Temporary
-# ========================
-*.log
-*.tmp
-*.temp
-*.bak
-*.orig
-
-# ========================
-# Docker
-# ========================
-docker-compose.override.yml
-*.env
-
-# ========================
-# Other generated files
-# ========================
+####################################
+# Backend – Java / Maven / Spring
+####################################
+backend/target/
+**/target/
 *.class
+*.log
 *.jar
 *.war
 *.ear
-*.iml
+
+# Embedded DBs
+*.db
+*.h2.db
+
+# Maven wrapper (KEEP)
+!backend/.mvn/wrapper/maven-wrapper.jar
+!backend/.mvn/wrapper/maven-wrapper.properties
+!backend/mvnw
+!backend/mvnw.cmd
+
+####################################
+# Spring Boot
+####################################
+application-local.yml
+application-dev.yml
+application-prod.yml
+
+####################################
+# Environment files
+####################################
+.env
+.env.*
+*.env
+
+####################################
+# Docker
+####################################
+docker-compose.override.yml
+
+####################################
+# Frontend – Vite / React / Node
+####################################
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.eslintcache
+
+####################################
+# Logs / Temp
+####################################
+*.tmp
+*.temp
+*.bak
+
+####################################
+# Ignore compiled frontend assets
+####################################
+**/build/

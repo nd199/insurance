@@ -58,15 +58,13 @@ public class AuthController {
             throw new IllegalArgumentException("Invalid username or password");
         }
 
-        // Generate JWT with role
         String token = jwtUtil.generateToken(admin.getUsername(), admin.getRole());
 
-        // Create HttpOnly cookie
         ResponseCookie cookie = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
-                .secure(true) // set false for dev if not using HTTPS
+                .secure(true)
                 .path("/")
-                .maxAge(24 * 60 * 60) // 1 day
+                .maxAge(24 * 60 * 60)
                 .sameSite("Strict")
                 .build();
 

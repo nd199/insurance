@@ -10,55 +10,66 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AdminRepository adminRepository;
+    private final AdminRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public AuthController(AdminRepository adminRepository,
-                          PasswordEncoder passwordEncoder,
-                          JwtUtil jwtUtil) {
-        this.adminRepository = adminRepository;
+    public AuthController(
+            AdminRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            JwtUtil jwtUtil
+    ) {
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<AdminResponse> signup(@Valid @RequestBody AdminCreateRequest request) {
-
-        if (adminRepository.existsByUsername(request.username())) {
+    public ResponseEntity<AdminResponse> signup(
+            @Valid @RequestBody AdminCreateRequest request
+    ) {
+        if (userRepository.existsByUsername(request.username())) {
             throw new IllegalArgumentException("Username already exists");
         }
 
-        Admin admin = new Admin(
+        Admin user = new Admin(
                 request.username(),
                 passwordEncoder.encode(request.password()),
                 request.role()
         );
 
-        Admin saved = adminRepository.save(admin);
-        AdminResponse response = new AdminResponse(saved.getId(), saved.getUsername(), saved.getRole());
-        return ResponseEntity.ok(response);
+        Admin saved = userRepository.save(user);
+
+        return ResponseEntity.ok(
+                new AdminResponse(
+                        saved.getId(),
+                        saved.getUsername(),
+                        saved.getRole()
+                )
+        );
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
-        Admin admin = adminRepository.findByUsername(request.username())
+    public ResponseEntity<AuthResponse> login(
+            @Valid @RequestBody AuthRequest request
+    ) {
+        Admin user = userRepository.findByUsername(request.username())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid username or password"));
 
-        if (!passwordEncoder.matches(request.password(), admin.getPassword())) {
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new IllegalArgumentException("Invalid username or password");
         }
 
-        String token = jwtUtil.generateToken(admin.getUsername(), admin.getRole());
+        String token = jwtUtil.generateToken(
+                user.getUsername(),
+                user.getRole()
+        );
 
         ResponseCookie cookie = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
@@ -70,12 +81,16 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new AuthResponse("Login successful"));
+                .body(new AuthResponse(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getRole()
+                ));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<AuthResponse> logout() {
-        // Invalidate cookie
+    public ResponseEntity<Void> logout() {
+
         ResponseCookie cookie = ResponseCookie.from("jwt", "")
                 .httpOnly(true)
                 .secure(true)
@@ -86,6 +101,6 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new AuthResponse("Logged out successfully"));
+                .build();
     }
 }

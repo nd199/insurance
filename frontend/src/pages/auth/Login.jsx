@@ -18,15 +18,11 @@ const Login = () => {
   const navigate = useNavigate();
   const { isLoading, error } = useSelector(state => state.auth);
 
-  const initialValues = { email: '', password: '' };
+  const initialValues = { username: '', password: '' };
 
   const validationSchema = Yup.object({
-    email: Yup.string()
-      .email('Enter valid email')
-      .required('Email is required'),
-    password: Yup.string()
-      .min(6, 'Password must be at least 6 characters')
-      .required('Password is required'),
+    username: Yup.string().required('Username required'),
+    password: Yup.string().required('Password required'),
   });
 
   const handleSubmit = async values => {
@@ -34,12 +30,13 @@ const Login = () => {
     try {
       const res = await authService.login(values);
       dispatch(loginSuccess(res));
+
       navigate(
-        res.user.role === 'ADMIN' ? '/admin/dashboard' : '/customer/dashboard',
+        res.role === 'ADMIN' ? '/admin/dashboard' : '/customer/dashboard',
         { replace: true }
       );
     } catch (err) {
-      dispatch(loginFailure(err?.response?.data?.message || 'Login failed'));
+      dispatch(loginFailure('Invalid credentials'));
     }
   };
 

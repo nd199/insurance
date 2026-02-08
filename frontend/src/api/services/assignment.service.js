@@ -15,3 +15,9 @@ export const terminateAssignment = async (id, endDate) => {
     params: { endDate },
   });
 };
+
+export default {
+  assignPolicy,
+  getAssignments,
+  terminateAssignment,
+};

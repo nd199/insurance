@@ -16,8 +16,7 @@ import authService from '../../api/services/auth.service';
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoading, error } = useSelector(state => state.auth);
-
+  const { isLoading, loginError } = useSelector(state => state.auth);
   const initialValues = { username: '', password: '' };
 
   const validationSchema = Yup.object({
@@ -116,10 +115,10 @@ const Login = () => {
                 <div className="relative group">
                   <FiMail className="absolute text-gray-400 transition-colors -translate-y-1/2 left-4 top-1/2 group-focus-within:text-blue-500" />
                   <Field
-                    id="email"
-                    name="email"
+                    id="username"
+                    name="username"
                     type="email"
-                    placeholder="policy@insurance.com"
+                    placeholder="admin / email"
                     className="w-full pl-12 pr-4 text-lg placeholder-gray-400 transition-all border-2 shadow-sm h-14 rounded-2xl bg-white/80 backdrop-blur-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 hover:shadow-md"
                   />
                 </div>
@@ -159,16 +158,14 @@ const Login = () => {
                 />
               </motion.div>
 
-              {error && (
+              {loginError && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="flex items-center gap-3 p-4 border border-red-200 shadow-sm rounded-2xl bg-red-50"
                 >
                   <FiShield className="w-6 h-6 text-red-500" />
-                  <span className="text-sm font-semibold text-red-700">
-                    {error}
-                  </span>
+                  {loginError && <span>{loginError}</span>}
                 </motion.div>
               )}
 

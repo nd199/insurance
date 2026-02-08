@@ -1,5 +1,3 @@
-
-
 import { Component } from 'react';
 import { FiAlertTriangle, FiRefreshCcw } from 'react-icons/fi';
 

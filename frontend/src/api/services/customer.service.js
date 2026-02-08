@@ -14,3 +14,9 @@ export const createCustomer = async payload => {
   const { data } = await api.post('/customers', payload);
   return data;
 };
+
+export default {
+  getCustomers,
+  getCustomerById,
+  createCustomer,
+};

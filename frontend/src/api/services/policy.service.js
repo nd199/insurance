@@ -18,3 +18,10 @@ export const createPolicy = async policyData => {
 export const expirePolicy = async id => {
   await api.put(`/policies/${id}/expire`);
 };
+
+export default {
+  getPolicies,
+  getPolicyById,
+  createPolicy,
+  expirePolicy,
+};

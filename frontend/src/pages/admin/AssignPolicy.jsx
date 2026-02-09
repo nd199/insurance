@@ -3,7 +3,9 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { motion } from 'framer-motion';
 import { FiUser, FiFileText, FiCalendar, FiCheckCircle } from 'react-icons/fi';
+import customerService from '../../api/services/customer.service';
 import policyService from '../../api/services/policy.service';
+import assignmentService from '../../api/services/assignment.service';
 
 const AssignPolicy = () => {
   const [customers, setCustomers] = useState([]);
@@ -15,27 +17,24 @@ const AssignPolicy = () => {
     customerId: '',
     policyId: '',
     startDate: '',
-    endDate: '',
   };
 
   const validationSchema = Yup.object({
     customerId: Yup.string().required('Select a customer'),
     policyId: Yup.string().required('Select a policy'),
     startDate: Yup.date().required('Start date is required'),
-    endDate: Yup.date()
-      .min(Yup.ref('startDate'), 'End date cannot be before start date')
-      .required('End date is required'),
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const customersRes = await policyService.getCustomers();
+        const customersRes = await customerService.getCustomers();
         setCustomers(customersRes);
         const policiesRes = await policyService.getPolicies();
         setPolicies(policiesRes);
       } catch (err) {
         console.error(err);
+        setError('Failed to load data');
       }
     };
     fetchData();
@@ -43,7 +42,7 @@ const AssignPolicy = () => {
 
   const handleSubmit = async (values, { resetForm }) => {
     try {
-      await policyService.assignPolicy(values);
+      await assignmentService.assignPolicy(values);
       setMessage('Policy assigned successfully!');
       setError(null);
       resetForm();
@@ -152,8 +151,7 @@ const AssignPolicy = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
+            <div className="space-y-1">
                 <label className="block text-sm font-semibold text-gray-700">
                   Start Date
                 </label>
@@ -171,26 +169,6 @@ const AssignPolicy = () => {
                   className="mt-1 text-sm text-red-500"
                 />
               </div>
-
-              <div className="space-y-1">
-                <label className="block text-sm font-semibold text-gray-700">
-                  End Date
-                </label>
-                <div className="relative">
-                  <FiCalendar className="absolute w-5 h-5 text-gray-400 -translate-y-1/2 left-3 top-1/2" />
-                  <Field
-                    type="date"
-                    name="endDate"
-                    className="w-full h-12 pl-10 pr-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400"
-                  />
-                </div>
-                <ErrorMessage
-                  name="endDate"
-                  component="div"
-                  className="mt-1 text-sm text-red-500"
-                />
-              </div>
-            </div>
 
             <motion.button
               type="submit"

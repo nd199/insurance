@@ -15,8 +15,20 @@ export const createCustomer = async payload => {
   return data;
 };
 
+export const getCustomerPolicies = async customerId => {
+  const { data } = await api.get(`/customers/${customerId}/policies`);
+  return data;
+};
+
+export const getCustomerActivePolicies = async customerId => {
+  const { data } = await api.get(`/customers/${customerId}/policies/active`);
+  return data;
+};
+
 export default {
   getCustomers,
   getCustomerById,
   createCustomer,
+  getCustomerPolicies,
+  getCustomerActivePolicies,
 };

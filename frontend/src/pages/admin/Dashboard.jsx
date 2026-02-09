@@ -1,48 +1,72 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { HiShieldCheck, HiClock } from 'react-icons/hi';
 import { HiSignal } from 'react-icons/hi2';
+import policyService from '../../api/services/policy.service';
+import customerService from '../../api/services/customer.service';
+import assignmentService from '../../api/services/assignment.service';
 
 const policyStatusStyles = {
   ACTIVE: 'bg-emerald-100 text-emerald-700',
   EXPIRED: 'bg-rose-100 text-rose-700',
-  PENDING: 'bg-amber-100 text-amber-700',
+  SUSPENDED: 'bg-amber-100 text-amber-700',
+  CANCELLED: 'bg-slate-100 text-slate-700',
 };
 
-const policies = [
-  {
-    id: 'POL-001',
-    name: 'Silver Health Protect',
-    coverage: 'Primary + Dental',
-    premium: '$320 / mo',
-    status: 'ACTIVE',
-    startDate: '2024-03-01',
-    endDate: '2025-03-01',
-  },
-  {
-    id: 'POL-002',
-    name: 'Family Shield Classic',
-    coverage: 'Family + Vision',
-    premium: '$420 / mo',
-    status: 'ACTIVE',
-    startDate: '2024-01-01',
-    endDate: '2025-01-01',
-  },
-  {
-    id: 'POL-003',
-    name: 'Auto Comprehensive',
-    coverage: 'Collision + Roadside',
-    premium: '$180 / mo',
-    status: 'EXPIRED',
-    startDate: '2022-07-01',
-    endDate: '2023-07-01',
-  },
-];
-
 export default function AdminDashboard() {
+  const [policies, setPolicies] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [assignments, setAssignments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const [policiesData, customersData, assignmentsData] = await Promise.all([
+          policyService.getPolicies(),
+          customerService.getCustomers(),
+          assignmentService.getAssignments(),
+        ]);
+        setPolicies(policiesData);
+        setCustomers(customersData);
+        setAssignments(assignmentsData);
+      } catch (err) {
+        setError('Failed to load dashboard data');
+        console.error('Dashboard data fetch error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
   const activePolicies = useMemo(
     () => policies.filter(policy => policy.status === 'ACTIVE'),
-    []
+    [policies]
   );
+
+  const totalCustomers = customers.length;
+  const activeAssignments = assignments.filter(assignment => 
+    assignment.policy?.status === 'ACTIVE'
+  ).length;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading dashboard...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-red-600">Error: {error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen px-4 py-6 bg-slate-50 sm:px-6 lg:px-8">
@@ -81,22 +105,22 @@ export default function AdminDashboard() {
 
             <div className="p-4 bg-white border rounded-2xl border-slate-100">
               <p className="text-sm font-medium text-slate-500">
-                Total Coverage
+                Total Customers
               </p>
               <p className="text-3xl font-semibold text-slate-900">
-                4 Families
+                {totalCustomers}
               </p>
               <p className="mt-1 text-sm text-slate-500">
-                Premium tiers monitored
+                Registered customers
               </p>
             </div>
 
             <div className="p-4 bg-white border rounded-2xl border-slate-100">
-              <p className="text-sm font-medium text-slate-500">Alerts</p>
-              <p className="text-3xl font-semibold text-slate-900">2 Open</p>
+              <p className="text-sm font-medium text-slate-500">Active Assignments</p>
+              <p className="text-3xl font-semibold text-slate-900">{activeAssignments}</p>
               <p className="flex items-center gap-1 mt-1 text-sm text-amber-500">
                 <HiClock className="w-4 h-4" />
-                Renewals due in 30 days
+                Policies currently assigned
               </p>
             </div>
           </div>
@@ -121,7 +145,10 @@ export default function AdminDashboard() {
                 Expired
               </span>
               <span className="px-3 py-1 font-semibold rounded-full bg-amber-50 text-amber-600">
-                Pending Review
+                Suspended
+              </span>
+              <span className="px-3 py-1 font-semibold rounded-full bg-slate-50 text-slate-600">
+                Cancelled
               </span>
             </div>
           </div>
@@ -134,7 +161,7 @@ export default function AdminDashboard() {
               >
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                    {policy.id}
+                    POL-{policy.id}
                   </p>
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-semibold ${policyStatusStyles[policy.status]}`}
@@ -144,18 +171,18 @@ export default function AdminDashboard() {
                 </div>
                 <div className="mt-4 space-y-2">
                   <h3 className="text-lg font-semibold text-slate-900">
-                    {policy.name}
+                    {policy.policyName}
                   </h3>
-                  <p className="text-sm text-slate-500">{policy.coverage}</p>
+                  <p className="text-sm text-slate-500">Premium: ${policy.premiumAmount}</p>
                   <p className="text-sm font-semibold text-slate-700">
-                    {policy.premium}
+                    Status: {policy.status}
                   </p>
                 </div>
                 <div className="flex items-center justify-between mt-4 text-xs text-slate-500">
                   <div>
-                    <p>Start</p>
+                    <p>Created</p>
                     <p className="text-sm font-medium text-slate-800">
-                      {new Date(policy.startDate).toLocaleDateString('en-US', {
+                      {new Date(policy.createdAt).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
                         year: 'numeric',
@@ -163,9 +190,9 @@ export default function AdminDashboard() {
                     </p>
                   </div>
                   <div>
-                    <p>End</p>
+                    <p>Updated</p>
                     <p className="text-sm font-medium text-slate-800">
-                      {new Date(policy.endDate).toLocaleDateString('en-US', {
+                      {new Date(policy.updatedAt).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
                         year: 'numeric',

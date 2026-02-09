@@ -1,8 +1,10 @@
 package com.naren.insurance.controller;
 
 import com.naren.insurance.dto.mapper.CustomerMapper;
+import com.naren.insurance.dto.mapper.PolicyAssignmentMapper;
 import com.naren.insurance.dto.request.CustomerCreateRequest;
 import com.naren.insurance.dto.response.CustomerResponse;
+import com.naren.insurance.dto.response.PolicyAssignmentResponse;
 import com.naren.insurance.service.CustomerService;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +45,22 @@ public class CustomerController {
         return customerService.getAllCustomers()
                 .stream()
                 .map(CustomerMapper::toResponse)
+                .toList();
+    }
+
+    @GetMapping("/{id}/policies")
+    public List<PolicyAssignmentResponse> getCustomerPolicies(@PathVariable Long id) {
+        return customerService.getCustomerPolicies(id)
+                .stream()
+                .map(PolicyAssignmentMapper::toResponse)
+                .toList();
+    }
+
+    @GetMapping("/{id}/policies/active")
+    public List<PolicyAssignmentResponse> getCustomerActivePolicies(@PathVariable Long id) {
+        return customerService.getActivePolicies(id)
+                .stream()
+                .map(PolicyAssignmentMapper::toResponse)
                 .toList();
     }
 }

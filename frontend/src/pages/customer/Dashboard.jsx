@@ -1,48 +1,61 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { HiShieldCheck, HiClock } from 'react-icons/hi';
 import { HiSignal } from 'react-icons/hi2';
+import customerService from '../../api/services/customer.service';
 
 const policyStatusStyles = {
   ACTIVE: 'bg-emerald-100 text-emerald-700',
   EXPIRED: 'bg-rose-100 text-rose-700',
-  PENDING: 'bg-amber-100 text-amber-700',
+  SUSPENDED: 'bg-amber-100 text-amber-700',
+  CANCELLED: 'bg-slate-100 text-slate-700',
 };
 
-const policies = [
-  {
-    id: 'POL-001',
-    name: 'Silver Health Protect',
-    coverage: 'Primary + Dental',
-    premium: '$320 / mo',
-    status: 'ACTIVE',
-    startDate: '2024-03-01',
-    endDate: '2025-03-01',
-  },
-  {
-    id: 'POL-002',
-    name: 'Family Shield Classic',
-    coverage: 'Family + Vision',
-    premium: '$420 / mo',
-    status: 'ACTIVE',
-    startDate: '2024-01-01',
-    endDate: '2025-01-01',
-  },
-  {
-    id: 'POL-003',
-    name: 'Auto Comprehensive',
-    coverage: 'Collision + Roadside',
-    premium: '$180 / mo',
-    status: 'EXPIRED',
-    startDate: '2022-07-01',
-    endDate: '2023-07-01',
-  },
-];
-
 export default function CustomerDashboard() {
+  const { user } = useSelector(state => state.auth);
+  const [customerPolicies, setCustomerPolicies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCustomerPolicies = async () => {
+      if (!user?.id) return;
+
+      try {
+        setLoading(true);
+        const policies = await customerService.getCustomerPolicies(user.id);
+        setCustomerPolicies(policies);
+      } catch (err) {
+        setError('Failed to load your policies');
+        console.error('Customer policies fetch error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomerPolicies();
+  }, [user?.id]);
+
   const activePolicies = useMemo(
-    () => policies.filter(policy => policy.status === 'ACTIVE'),
-    []
+    () => customerPolicies.filter(assignment => assignment.policy?.status === 'ACTIVE'),
+    [customerPolicies]
   );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading your policies...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-red-600">Error: {error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen px-4 py-6 bg-slate-50 sm:px-6 lg:px-8">
@@ -55,7 +68,7 @@ export default function CustomerDashboard() {
                 Welcome back
               </p>
               <h1 className="text-2xl font-semibold text-slate-900">
-                Jordan Michaels
+                {user?.username || 'Customer'}
               </h1>
             </div>
             <button className="inline-flex items-center gap-2 px-5 py-2 text-sm font-medium text-white transition border rounded-full shadow-sm border-slate-200 bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
@@ -81,22 +94,24 @@ export default function CustomerDashboard() {
 
             <div className="p-4 bg-white border rounded-2xl border-slate-100">
               <p className="text-sm font-medium text-slate-500">
-                Total Coverage
+                Total Policies
               </p>
               <p className="text-3xl font-semibold text-slate-900">
-                4 Families
+                {customerPolicies.length}
               </p>
               <p className="mt-1 text-sm text-slate-500">
-                Premium tiers monitored
+                All your policies
               </p>
             </div>
 
             <div className="p-4 bg-white border rounded-2xl border-slate-100">
-              <p className="text-sm font-medium text-slate-500">Alerts</p>
-              <p className="text-3xl font-semibold text-slate-900">2 Open</p>
+              <p className="text-sm font-medium text-slate-500">Inactive Policies</p>
+              <p className="text-3xl font-semibold text-slate-900">
+                {customerPolicies.filter(assignment => assignment.policy?.status !== 'ACTIVE').length}
+              </p>
               <p className="flex items-center gap-1 mt-1 text-sm text-amber-500">
                 <HiClock className="w-4 h-4" />
-                Renewals due in 30 days
+                Expired or cancelled
               </p>
             </div>
           </div>
@@ -110,7 +125,7 @@ export default function CustomerDashboard() {
                 Assigned Policies
               </p>
               <h2 className="text-xl font-semibold text-slate-900">
-                {policies.length} Policies Active & Expired
+                {customerPolicies.length} Policies Active & Expired
               </h2>
             </div>
             <div className="flex flex-wrap gap-2 text-sm">
@@ -121,41 +136,44 @@ export default function CustomerDashboard() {
                 Expired
               </span>
               <span className="px-3 py-1 font-semibold rounded-full bg-amber-50 text-amber-600">
-                Pending Review
+                Suspended
+              </span>
+              <span className="px-3 py-1 font-semibold rounded-full bg-slate-50 text-slate-600">
+                Cancelled
               </span>
             </div>
           </div>
 
           <div className="grid gap-4 mt-6 md:grid-cols-2">
-            {policies.map(policy => (
+            {customerPolicies.map(assignment => (
               <article
-                key={policy.id}
+                key={assignment.id}
                 className="flex min-h-[200px] flex-col justify-between rounded-2xl border border-slate-100 bg-slate-50 p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                    {policy.id}
+                    POL-{assignment.policy?.id}
                   </p>
                   <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${policyStatusStyles[policy.status]}`}
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${policyStatusStyles[assignment.policy?.status]}`}
                   >
-                    {policy.status}
+                    {assignment.policy?.status}
                   </span>
                 </div>
                 <div className="mt-4 space-y-2">
                   <h3 className="text-lg font-semibold text-slate-900">
-                    {policy.name}
+                    {assignment.policy?.policyName}
                   </h3>
-                  <p className="text-sm text-slate-500">{policy.coverage}</p>
+                  <p className="text-sm text-slate-500">Premium: ${assignment.policy?.premiumAmount}</p>
                   <p className="text-sm font-semibold text-slate-700">
-                    {policy.premium}
+                    Assigned: {new Date(assignment.startDate).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="flex items-center justify-between mt-4 text-xs text-slate-500">
                   <div>
-                    <p>Start</p>
+                    <p>Start Date</p>
                     <p className="text-sm font-medium text-slate-800">
-                      {new Date(policy.startDate).toLocaleDateString('en-US', {
+                      {new Date(assignment.startDate).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
                         year: 'numeric',
@@ -163,13 +181,9 @@ export default function CustomerDashboard() {
                     </p>
                   </div>
                   <div>
-                    <p>End</p>
+                    <p>Policy Status</p>
                     <p className="text-sm font-medium text-slate-800">
-                      {new Date(policy.endDate).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}
+                      {assignment.policy?.status}
                     </p>
                   </div>
                 </div>

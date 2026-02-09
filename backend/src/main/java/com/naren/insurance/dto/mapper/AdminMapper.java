@@ -7,11 +7,11 @@ import com.naren.insurance.model.Admin;
 public class AdminMapper {
 
     public static Admin toEntity(AdminCreateRequest request) {
-        return new Admin(
-                request.username(),
-                request.password(),
-                request.role()
-        );
+        return Admin.builder()
+                .username(request.username())
+                .password(request.password())
+                .role(request.role())
+                .build();
     }
 
     public static AdminResponse toResponse(Admin admin) {

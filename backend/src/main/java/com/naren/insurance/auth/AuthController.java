@@ -38,11 +38,11 @@ public class AuthController {
             throw new IllegalArgumentException("Username already exists");
         }
 
-        Admin user = new Admin(
-                request.username(),
-                passwordEncoder.encode(request.password()),
-                request.role()
-        );
+        Admin user = Admin.builder()
+                .username(request.username())
+                .password(passwordEncoder.encode(request.password()))
+                .role(request.role())
+                .build();
 
         Admin saved = userRepository.save(user);
 

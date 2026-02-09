@@ -14,4 +14,6 @@ public interface PolicyService {
     List<Policy> getAllPolicies();
 
     void expirePolicy(Long policyId);
+
+    Policy updatePolicy(Long policyId, String policyName, BigDecimal premiumAmount);
 }

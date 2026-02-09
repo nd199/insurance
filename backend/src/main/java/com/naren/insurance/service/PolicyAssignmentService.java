@@ -16,4 +16,6 @@ public interface PolicyAssignmentService {
     List<PolicyAssignment> getAllAssignments();
 
     void terminateAssignment(Long assignmentId, LocalDate endDate);
+
+    List<PolicyAssignment> getAssignmentsForCustomer(Long customerId);
 }

@@ -11,6 +11,7 @@ import lombok.*;
 @Entity
 @Table(name = "customers", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder

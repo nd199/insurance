@@ -12,7 +12,8 @@ import java.time.LocalDate;
         uniqueConstraints = @UniqueConstraint(columnNames = {"customer_id", "policy_id"})
 )
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA only
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class PolicyAssignment extends BaseEntity {

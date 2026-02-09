@@ -12,6 +12,7 @@ import lombok.*;
         uniqueConstraints = @UniqueConstraint(columnNames = "username")
 )
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
